@@ -343,8 +343,8 @@ select.act-select{width:100%;max-width:340px;}
 // Get these from Supabase: Project Settings > API. The anon key is
 // meant to be public (it only grants what the RLS policies in
 // schema.sql allow) so it's fine to leave it in this client file.
-const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+const SUPABASE_URL = 'https://vvyogjfvzyssvxddmsdg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2eW9namZ2enlzc3Z4ZGRtc2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1Mjc2MzgsImV4cCI6MjEwNjEwMzYzOH0.55Sjfz5P5V1Agx0fKDZm0O88jOs5qn7dnjz7aLgyXhQ';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function codeToEmail(code){ return code.trim().toLowerCase() + '@sams.local'; }
