@@ -343,8 +343,8 @@ select.act-select{width:100%;max-width:340px;}
 // Get these from Supabase: Project Settings > API. The anon key is
 // meant to be public (it only grants what the RLS policies in
 // schema.sql allow) so it's fine to leave it in this client file.
-const SUPABASE_URL = 'https://vvyogjfvzyssvxddmsdg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2eW9namZ2enlzc3Z4ZGRtc2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1Mjc2MzgsImV4cCI6MjEwNjEwMzYzOH0.55Sjfz5P5V1Agx0fKDZm0O88jOs5qn7dnjz7aLgyXhQ';
+const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function codeToEmail(code){ return code.trim().toLowerCase() + '@sams.local'; }
@@ -987,25 +987,20 @@ function adminTypesPage(){
   `;
 }
 async function addType(){
-  try{
-    const input = document.getElementById('new-type-input');
-    const val = input.value.trim();
-    if(!val){ alert('กรุณากรอกชื่อประเภทกิจกรรม'); return; }
-    if(db.activityTypes.includes(val)){ alert('มีประเภทนี้อยู่แล้ว'); return; }
-    const { error } = await sb.from('activity_types').insert({ name: val });
-    if(error){ console.error('addType error:', error); alert('เพิ่มไม่สำเร็จ: ' + error.message); return; }
-    await refreshDB();
-    renderAdminApp();
-  }catch(e){ console.error('addType exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+  const input = document.getElementById('new-type-input');
+  const val = input.value.trim();
+  if(!val){ alert('กรุณากรอกชื่อประเภทกิจกรรม'); return; }
+  if(db.activityTypes.includes(val)){ alert('มีประเภทนี้อยู่แล้ว'); return; }
+  const { error } = await sb.from('activity_types').insert({ name: val });
+  if(error){ alert(error.message); return; }
+  await refreshDB();
+  renderAdminApp();
 }
 async function deleteType(t){
-  try{
-    if(!confirm('ยืนยันการลบประเภทกิจกรรมนี้?')) return;
-    const { error } = await sb.from('activity_types').delete().eq('name', t);
-    if(error){ console.error('deleteType error:', error); alert('ลบไม่สำเร็จ: ' + error.message); return; }
-    await refreshDB();
-    renderAdminApp();
-  }catch(e){ console.error('deleteType exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+  if(!confirm('ยืนยันการลบประเภทกิจกรรมนี้?')) return;
+  await sb.from('activity_types').delete().eq('name', t);
+  await refreshDB();
+  renderAdminApp();
 }
 
 function adminYearsPage(){
@@ -1030,35 +1025,26 @@ function adminYearsPage(){
   `;
 }
 async function addYear(){
-  try{
-    const input = document.getElementById('new-year-input');
-    const val = input.value.trim();
-    if(!val){ alert('กรุณากรอกปีการศึกษา'); return; }
-    if(db.academicYears.list.includes(val)){ alert('มีปีการศึกษานี้อยู่แล้ว'); return; }
-    const { error } = await sb.from('academic_years').insert({ year: val, is_current:false });
-    if(error){ console.error('addYear error:', error); alert('เพิ่มไม่สำเร็จ: ' + error.message); return; }
-    await refreshDB();
-    renderAdminApp();
-  }catch(e){ console.error('addYear exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+  const input = document.getElementById('new-year-input');
+  const val = input.value.trim();
+  if(!val){ alert('กรุณากรอกปีการศึกษา'); return; }
+  if(db.academicYears.list.includes(val)){ alert('มีปีการศึกษานี้อยู่แล้ว'); return; }
+  const { error } = await sb.from('academic_years').insert({ year: val, is_current:false });
+  if(error){ alert(error.message); return; }
+  await refreshDB();
+  renderAdminApp();
 }
 async function setCurrentYear(y){
-  try{
-    const { error: e1 } = await sb.from('academic_years').update({ is_current:false }).eq('is_current', true);
-    if(e1){ console.error('setCurrentYear error (clear):', e1); alert('ตั้งค่าไม่สำเร็จ: ' + e1.message); return; }
-    const { error: e2 } = await sb.from('academic_years').update({ is_current:true }).eq('year', y);
-    if(e2){ console.error('setCurrentYear error (set):', e2); alert('ตั้งค่าไม่สำเร็จ: ' + e2.message); return; }
-    await refreshDB();
-    renderAdminApp();
-  }catch(e){ console.error('setCurrentYear exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+  await sb.from('academic_years').update({ is_current:false }).eq('is_current', true);
+  await sb.from('academic_years').update({ is_current:true }).eq('year', y);
+  await refreshDB();
+  renderAdminApp();
 }
 async function deleteYear(y){
-  try{
-    if(!confirm('ยืนยันการลบปีการศึกษานี้?')) return;
-    const { error } = await sb.from('academic_years').delete().eq('year', y);
-    if(error){ console.error('deleteYear error:', error); alert('ลบไม่สำเร็จ: ' + error.message); return; }
-    await refreshDB();
-    renderAdminApp();
-  }catch(e){ console.error('deleteYear exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+  if(!confirm('ยืนยันการลบปีการศึกษานี้?')) return;
+  await sb.from('academic_years').delete().eq('year', y);
+  await refreshDB();
+  renderAdminApp();
 }
 
 function adminUsersPage(){
@@ -1117,86 +1103,42 @@ function toggleUserFields(){
   document.getElementById('nu_role_wrap').style.display = t==='staff' ? 'block' : 'none';
 }
 async function addUser(){
+  const type = document.getElementById('nu_type').value;
+  const id = document.getElementById('nu_id').value.trim();
+  const pw = document.getElementById('nu_pw').value.trim();
+  const name = document.getElementById('nu_name').value.trim();
+  const staffRole = document.getElementById('nu_role').value;
   const errBox = document.getElementById('adduser-error');
-  try{
-    const type = document.getElementById('nu_type').value;
-    const id = document.getElementById('nu_id').value.trim();
-    const pw = document.getElementById('nu_pw').value.trim();
-    const name = document.getElementById('nu_name').value.trim();
-    const staffRole = document.getElementById('nu_role').value;
-    errBox.style.display = 'none';
-    if(!id || !pw || !name){ alert('กรุณากรอกรหัสผู้ใช้ รหัสผ่าน และชื่อ-นามสกุลให้ครบ'); return; }
-    if(pw.length < 6){ alert('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'); return; }
-    const { data: { session: sbSession } } = await sb.auth.getSession();
-    if(!sbSession){ errBox.textContent = 'เซสชันหมดอายุ กรุณาล็อกอินใหม่'; errBox.style.display='block'; return; }
-    let resp;
-    try{
-      resp = await fetch('/api/create-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code:id, password:pw, name, role:type, staffRole, authToken: sbSession.access_token })
-      });
-    }catch(netErr){
-      console.error('addUser network error:', netErr);
-      errBox.textContent = 'เชื่อมต่อ /api/create-user ไม่ได้ (เช็คว่า deploy ขึ้น Vercel แล้วหรือยัง และตั้งค่า Environment Variables ครบหรือไม่)';
-      errBox.style.display = 'block';
-      return;
-    }
-    let result;
-    try{
-      result = await resp.json();
-    }catch(parseErr){
-      console.error('addUser non-JSON response, status:', resp.status);
-      errBox.textContent = `เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง (HTTP ${resp.status}) — /api/create-user อาจยังไม่ได้ deploy หรือ path ผิด`;
-      errBox.style.display = 'block';
-      return;
-    }
-    if(!resp.ok){
-      console.error('addUser API error:', result);
-      errBox.textContent = result.error || `เกิดข้อผิดพลาด (HTTP ${resp.status})`;
-      errBox.style.display = 'block';
-      return;
-    }
-    await refreshDB();
-    renderAdminApp();
-  }catch(e){
-    console.error('addUser exception:', e);
-    errBox.textContent = 'เกิดข้อผิดพลาด: ' + e.message;
+  errBox.style.display = 'none';
+  if(!id || !pw || !name){ alert('กรุณากรอกรหัสผู้ใช้ รหัสผ่าน และชื่อ-นามสกุลให้ครบ'); return; }
+  if(pw.length < 6){ alert('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'); return; }
+  const { data: { session: sbSession } } = await sb.auth.getSession();
+  const resp = await fetch('/api/create-user', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code:id, password:pw, name, role:type, staffRole, authToken: sbSession.access_token })
+  });
+  const result = await resp.json();
+  if(!resp.ok){
+    errBox.textContent = result.error || 'เกิดข้อผิดพลาด';
     errBox.style.display = 'block';
+    return;
   }
+  await refreshDB();
+  renderAdminApp();
 }
 async function deleteUser(targetId){
-  try{
-    if(!confirm('ยืนยันการลบผู้ใช้งานนี้?')) return;
-    const { data: { session: sbSession } } = await sb.auth.getSession();
-    if(!sbSession){ alert('เซสชันหมดอายุ กรุณาล็อกอินใหม่'); return; }
-    let resp;
-    try{
-      resp = await fetch('/api/delete-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetId, authToken: sbSession.access_token })
-      });
-    }catch(netErr){
-      console.error('deleteUser network error:', netErr);
-      alert('เชื่อมต่อ /api/delete-user ไม่ได้ (เช็คว่า deploy ขึ้น Vercel แล้วหรือยัง)');
-      return;
-    }
-    let result;
-    try{
-      result = await resp.json();
-    }catch(parseErr){
-      console.error('deleteUser non-JSON response, status:', resp.status);
-      alert(`เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง (HTTP ${resp.status})`);
-      return;
-    }
-    if(!resp.ok){ console.error('deleteUser API error:', result); alert(result.error || `เกิดข้อผิดพลาด (HTTP ${resp.status})`); return; }
-    await refreshDB();
-    renderAdminApp();
-  }catch(e){
-    console.error('deleteUser exception:', e);
-    alert('เกิดข้อผิดพลาด: ' + e.message);
-  }
+  if(!confirm('ยืนยันการลบผู้ใช้งานนี้?')) return;
+  const { data: { session: sbSession } } = await sb.auth.getSession();
+  const resp = await fetch('/api/delete-user', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ targetId, authToken: sbSession.access_token })
+  });
+  const result = await resp.json();
+  if(!resp.ok){ alert(result.error || 'เกิดข้อผิดพลาด'); return; }
+  await refreshDB();
+  renderAdminApp();
 }
 
 // ---------- boot ----------
