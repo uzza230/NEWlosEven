@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMS - ระบบจัดการการจัดกิจกรรมในโรงเรียน</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap');
+
+:root{
+  --navy:#1B2A4A;
+  --navy-2:#25375F;
+  --leaf:#5DA831;
+  --leaf-2:#8CC63F;
+  --cream:#F5F6FA;
+  --card:#FFFFFF;
+  --ink:#1B2333;
+  --ink-soft:#6B7280;
+  --line:#E4E6EE;
+  --green:#16A34A;
+  --blue:#2563EB;
+  --purple:#7C3AED;
+  --amber:#D97706;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Sarabun',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  min-height:100vh;
+}
+h1,h2,h3,.display{font-family:'Kanit',sans-serif;}
+button{font-family:'Sarabun',sans-serif;cursor:pointer;}
+input,select,textarea{font-family:'Sarabun',sans-serif;}
+
+/* ---------- LOGIN ---------- */
+.login-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px 16px;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(93,168,49,0.08), transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(27,42,74,0.06), transparent 40%),
+    var(--cream);
+}
+.login-card{
+  width:100%;
+  max-width:460px;
+  background:var(--card);
+  border-radius:20px;
+  padding:36px 34px 32px;
+  border:1px solid var(--line);
+  box-shadow:0 20px 50px -25px rgba(27,42,74,0.35);
+}
+.login-brand{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+.login-brand .mark{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(135deg,var(--leaf),var(--leaf-2));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:'Kanit';font-weight:700;font-size:16px;
+}
+.login-brand .name{font-family:'Kanit';font-weight:600;font-size:15px;color:var(--navy);}
+.login-brand .name small{display:block;font-family:'Sarabun';font-weight:400;font-size:11px;color:var(--ink-soft);}
+.login-card h1{font-size:24px;font-weight:600;margin:0 0 4px;color:var(--navy);text-align:center;}
+.login-card .sub{text-align:center;color:var(--ink-soft);font-size:13.5px;margin:0 0 22px;}
+.type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px;}
+.type-card{
+  border:1.5px solid var(--line);border-radius:12px;padding:14px 10px;
+  text-align:left;background:#fff;transition:.15s;
+}
+.type-card .ic{
+  width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;margin-bottom:8px;
+}
+.type-card.student .ic{background:#E6F1FB;color:var(--blue);}
+.type-card.staff .ic{background:#EAF6E3;color:var(--leaf);}
+.type-card.admin .ic{background:#EEEDFE;color:var(--purple);}
+.type-card b{display:block;font-size:13px;font-family:'Kanit';font-weight:500;color:var(--navy);}
+.type-card span{display:block;font-size:10.5px;color:var(--ink-soft);margin-top:2px;line-height:1.4;}
+.type-card.active{border-color:var(--leaf);box-shadow:0 0 0 3px rgba(93,168,49,0.12);}
+label.field-label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin:14px 0 6px;}
+.login-card input[type=text],.login-card input[type=password]{
+  width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;
+  outline:none;transition:.15s;background:#FAFAFC;
+}
+.login-card input:focus{border-color:var(--leaf);background:#fff;}
+.hint{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
+.login-btn{
+  width:100%;margin-top:20px;padding:13px;border:none;border-radius:11px;
+  background:linear-gradient(135deg,var(--leaf),var(--leaf-2));
+  color:#fff;font-size:15px;font-weight:600;font-family:'Kanit';
+  box-shadow:0 10px 20px -8px rgba(93,168,49,0.5);
+}
+.login-btn:active{transform:scale(0.98);}
+.login-error{
+  margin-top:14px;background:#FCEBEB;color:#791F1F;border-radius:10px;
+  padding:10px 12px;font-size:13px;text-align:center;
+}
+.demo-box{
+  margin-top:20px;border-top:1px dashed var(--line);padding-top:14px;
+  font-size:11.5px;color:var(--ink-soft);line-height:1.7;
+}
+.demo-box b{color:var(--navy);}
+
+/* ---------- APP SHELL ---------- */
+.app{display:none;min-height:100vh;}
+.app.show{display:flex;}
+.sidebar{
+  width:250px;flex-shrink:0;background:var(--navy);color:#fff;
+  padding:22px 16px;display:flex;flex-direction:column;
+}
+.sidebar .brand{display:flex;align-items:center;gap:10px;padding:0 6px 20px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:16px;}
+.sidebar .brand .mark{
+  width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--leaf),var(--leaf-2));
+  display:flex;align-items:center;justify-content:center;font-family:'Kanit';font-weight:700;color:#fff;font-size:14px;
+}
+.sidebar .brand .txt b{display:block;font-family:'Kanit';font-size:14px;}
+.sidebar .brand .txt small{display:block;font-size:10.5px;opacity:.6;}
+.user-chip{
+  display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);
+  border-radius:12px;padding:10px 12px;margin-bottom:18px;
+}
+.user-chip .av{
+  width:34px;height:34px;border-radius:50%;background:var(--leaf);
+  display:flex;align-items:center;justify-content:center;font-family:'Kanit';font-weight:600;font-size:13px;flex-shrink:0;
+}
+.user-chip .info b{display:block;font-size:12.5px;line-height:1.3;}
+.user-chip .info small{font-size:10.5px;opacity:.65;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;
+  color:rgba(255,255,255,0.75);font-size:13.5px;margin-bottom:4px;border:none;background:none;
+  width:100%;text-align:left;font-family:'Sarabun';
+}
+.nav-item .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:0;flex-shrink:0;}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+.nav-item.active{background:rgba(93,168,49,0.18);color:#fff;font-weight:600;}
+.nav-item.active .dot{opacity:1;background:var(--leaf-2);}
+.nav-item.logout{margin-top:auto;color:#F0997B;}
+.main-col{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh;}
+.main{flex:1;padding:28px 34px;overflow-x:hidden;width:100%;}
+.page-head{margin-bottom:22px;}
+.page-head h2{font-size:20px;margin:0 0 4px;color:var(--navy);}
+.page-head p{margin:0;color:var(--ink-soft);font-size:13.5px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+
+/* ---------- MOBILE TOPBAR / DRAWER ---------- */
+.topbar{display:none;align-items:center;gap:12px;background:var(--navy);color:#fff;padding:12px 14px;position:sticky;top:0;z-index:7;}
+.topbar .hamburger{
+  width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.08);border:none;color:#fff;
+  font-size:19px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.topbar .mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--leaf),var(--leaf-2));display:flex;align-items:center;justify-content:center;font-family:'Kanit';font-weight:700;font-size:12px;flex-shrink:0;}
+.topbar b{font-family:'Kanit';font-size:14px;font-weight:600;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,20,35,0.45);z-index:8;}
+.sidebar-overlay.show{display:block;}
+
+@media(max-width:900px){
+  .grid3{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:720px){
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .topbar{display:flex;}
+  .sidebar{
+    position:fixed;top:0;left:0;z-index:9;height:100vh;width:250px;max-width:82vw;
+    transform:translateX(-100%);transition:transform .25s ease;box-shadow:0 0 40px rgba(0,0,0,0.25);
+  }
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;padding:18px 16px 28px;}
+  .login-wrap{padding:20px 12px;}
+  .login-card{padding:26px 20px 24px;}
+  .type-grid{grid-template-columns:1fr;gap:8px;}
+  .type-card{display:flex;align-items:center;gap:12px;padding:10px 12px;text-align:left;}
+  .type-card .ic{margin-bottom:0;}
+  .type-card span{margin-top:0;}
+  .act-card{flex-direction:column;align-items:flex-start;gap:10px;}
+  .act-card>div:last-child{align-items:flex-start;width:100%;}
+  .act-card>div:last-child button{width:100%;}
+  table{display:block;overflow-x:auto;white-space:nowrap;}
+}
+@media(max-width:420px){
+  .grid3{grid-template-columns:1fr;}
+  .page-head h2{font-size:18px;}
+  .card{padding:16px 14px;}
+}
+@media print{
+  .sidebar,.topbar,.sidebar-overlay{display:none!important;}
+  .main{padding:0;}
+}
+
+.form-field{margin-bottom:14px;}
+.form-field label{display:block;font-size:12.5px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+.form-field input,.form-field select,.form-field textarea{
+  width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:13.5px;
+  background:#FAFAFC;outline:none;
+}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--leaf);background:#fff;}
+.btn{
+  padding:10px 18px;border-radius:10px;border:1.5px solid var(--line);background:#fff;
+  font-size:13.5px;font-weight:600;color:var(--navy);
+}
+.btn.primary{background:linear-gradient(135deg,var(--leaf),var(--leaf-2));color:#fff;border:none;}
+.btn.ghost{border:1.5px solid var(--line);background:#fff;}
+.btn.small{padding:6px 12px;font-size:12px;}
+.btn.danger{color:#A32D2D;border-color:#F0997B;}
+
+.avatar-lg{
+  width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,var(--leaf),var(--leaf-2));
+  color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Kanit';font-size:26px;font-weight:600;
+  flex-shrink:0;
+}
+.profile-head{display:flex;gap:18px;align-items:center;margin-bottom:6px;}
+.profile-head h3{margin:0 0 3px;font-size:17px;color:var(--navy);}
+.profile-head p{margin:0;color:var(--ink-soft);font-size:12.5px;}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;}
+.badge.registered{background:#E6F1FB;color:#0C447C;}
+.badge.attended{background:#EAF3DE;color:#173404;}
+.badge.open{background:#FAEEDA;color:#412402;}
+
+.stat{background:#F8F9FC;border-radius:12px;padding:16px 18px;}
+.stat .num{font-family:'Kanit';font-size:26px;font-weight:600;color:var(--navy);}
+.stat .lbl{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;color:var(--ink-soft);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;padding:8px 10px;border-bottom:1.5px solid var(--line);}
+td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+
+.act-card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px;display:flex;justify-content:space-between;gap:16px;align-items:center;}
+.act-card .tag,.tag{display:inline-block;padding:2px 9px;border-radius:100px;font-size:10.5px;font-weight:600;margin-bottom:6px;}
+.act-card h4{margin:0 0 4px;font-size:14.5px;color:var(--navy);font-family:'Kanit';font-weight:500;}
+.act-card .meta{font-size:12px;color:var(--ink-soft);line-height:1.6;}
+.tag.type-กีฬา{background:#E6F1FB;color:#0C447C;}
+.tag.type-จิตอาสา{background:#EAF3DE;color:#173404;}
+.tag.type-วิชาการ{background:#EEEDFE;color:#26215C;}
+.tag.type-ชุมนุม{background:#FBEAF0;color:#4B1528;}
+
+.empty{text-align:center;padding:30px 10px;color:var(--ink-soft);font-size:13px;}
+select.act-select{width:100%;max-width:340px;}
+</style>
+</head>
+<body>
+
+<div id="login-view" class="login-wrap">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="mark">S</div>
+      <div class="name">SAMS<small>School Activity Management System</small></div>
+    </div>
+    <h1>เข้าสู่ระบบ</h1>
+    <p class="sub">เลือกประเภทผู้ใช้ แล้วกรอกรหัสพร้อมรหัสผ่านเพื่อเข้าสู่ระบบ</p>
+
+    <div id="login-loading" style="text-align:center;padding:30px 0;color:var(--ink-soft);font-size:13.5px;">
+      กำลังเชื่อมต่อฐานข้อมูล...
+    </div>
+
+    <div id="login-form-area" style="display:none;">
+      <div class="type-grid">
+        <button class="type-card student active" id="type-student" onclick="setLoginType('student')">
+          <div class="ic">&#127891;</div>
+          <b>นักศึกษา</b>
+          <span>ตรวจสอบข้อมูลและกิจกรรมที่เข้าร่วม</span>
+        </button>
+        <button class="type-card staff" id="type-staff" onclick="setLoginType('staff')">
+          <div class="ic">&#128188;</div>
+          <b>บุคลากร</b>
+          <span>จัดการข้อมูลกิจกรรมและรายงาน</span>
+        </button>
+        <button class="type-card admin" id="type-admin" onclick="setLoginType('admin')">
+          <div class="ic">&#9881;&#65039;</div>
+          <b>ผู้ดูแลระบบ</b>
+          <span>กำหนดสิทธิ์และตั้งค่าระบบ</span>
+        </button>
+      </div>
+
+      <label class="field-label">รหัสผู้ใช้</label>
+      <input type="text" id="login-id" placeholder="รหัสนักศึกษา หรือ รหัสบุคลากร">
+
+      <label class="field-label">รหัสผ่าน</label>
+      <input type="password" id="login-pw" placeholder="รหัสผ่านของคุณ">
+      <div class="hint">นักศึกษาที่ยังไม่มีบัญชี กดปุ่ม "เข้าสู่ระบบนักศึกษาครั้งแรก" ด้านล่าง</div>
+
+      <button class="login-btn" id="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
+      <button type="button" class="btn ghost" id="go-register-btn" style="width:100%;margin-top:10px;padding:11px;" onclick="showRegisterView()">เข้าสู่ระบบนักศึกษาครั้งแรก</button>
+      <div id="login-error" style="display:none" class="login-error"></div>
+    </div>
+    <div id="sync-note" style="margin-top:12px;text-align:center;font-size:11px;color:var(--ink-soft);"></div>
+  </div>
+</div>
+
+<div id="register-view" class="login-wrap" style="display:none;">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="mark">S</div>
+      <div class="name">SAMS<small>School Activity Management System</small></div>
+    </div>
+    <h1>สมัครสมาชิกนักศึกษา</h1>
+    <p class="sub">เข้าสู่ระบบครั้งแรก กรอกข้อมูลเพื่อสร้างบัญชีของคุณเอง</p>
+
+    <label class="field-label">รหัสนักศึกษา</label>
+    <input type="text" id="reg-id" placeholder="เช่น 6511003">
+
+    <label class="field-label">ชื่อ-นามสกุล</label>
+    <input type="text" id="reg-name" placeholder="ชื่อ นามสกุล">
+
+    <label class="field-label">คณะ</label>
+    <input type="text" id="reg-faculty" placeholder="เช่น คณะวิทยาศาสตร์">
+
+    <label class="field-label">ตั้งรหัสผ่าน</label>
+    <input type="password" id="reg-pw" placeholder="อย่างน้อย 4 ตัวอักษร">
+
+    <label class="field-label">ยืนยันรหัสผ่าน</label>
+    <input type="password" id="reg-pw2" placeholder="กรอกรหัสผ่านอีกครั้ง">
+    <div class="hint">โปรดจำรหัสนักศึกษาและรหัสผ่านนี้ไว้สำหรับเข้าสู่ระบบครั้งถัดไป</div>
+
+    <button class="login-btn" id="register-btn" onclick="doRegisterStudent()">สมัครและเข้าสู่ระบบ</button>
+    <button type="button" class="btn ghost" style="width:100%;margin-top:10px;padding:11px;" onclick="showLoginView()">กลับไปหน้าเข้าสู่ระบบ</button>
+    <div id="register-error" style="display:none" class="login-error"></div>
+  </div>
+</div>
+
+<div id="app-view" class="app">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <div class="sidebar" id="sidebar"></div>
+  <div class="main-col">
+    <div class="topbar" id="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
+      <div class="mark">S</div>
+      <b>SAMS</b>
+    </div>
+    <div class="main" id="main"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+// ---------- Supabase setup ----------
+// Get these from Supabase: Project Settings > API. The anon key is
+// meant to be public (it only grants what the RLS policies in
+// schema.sql allow) so it's fine to leave it in this client file.
+const SUPABASE_URL = 'https://vvyogjfvzyssvxddmsdg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2eW9namZ2enlzc3Z4ZGRtc2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1Mjc2MzgsImV4cCI6MjEwNjEwMzYzOH0.55Sjfz5P5V1Agx0fKDZm0O88jOs5qn7dnjz7aLgyXhQ';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function codeToEmail(code){ return code.trim().toLowerCase() + '@sams.local'; }
+
+function seedDB(){
+  return { students:{}, staff:{}, admins:{}, activityTypes:[], academicYears:{list:[],current:null}, activities:{}, registrations:{} };
+}
+
+// Pulls everything the signed-in user is allowed to see (per RLS) and
+// reshapes it into the same `db` object the original render functions expect.
+async function loadDB(){
+  const [profilesR, activitiesR, registrationsR, typesR, yearsR] = await Promise.all([
+    sb.from('profiles').select('*'),
+    sb.from('activities').select('*'),
+    sb.from('registrations').select('*'),
+    sb.from('activity_types').select('name'),
+    sb.from('academic_years').select('*')
+  ]);
+  const out = seedDB();
+  (profilesR.data || []).forEach(p=>{
+    const rec = {...p};
+    if(p.role==='student') out.students[p.id] = rec;
+    else if(p.role==='staff') out.staff[p.id] = rec;
+    else out.admins[p.id] = rec;
+  });
+  (activitiesR.data || []).forEach(a=>{
+    out.activities[a.id] = {...a, date:a.activity_date, time:a.time_range, desc:a.description};
+  });
+  (registrationsR.data || []).forEach(r=>{
+    out.registrations[r.id] = {...r, activityId:r.activity_id, studentId:r.student_id, date:r.reg_date};
+  });
+  out.activityTypes = (typesR.data || []).map(t=>t.name);
+  const years = yearsR.data || [];
+  out.academicYears = { list: years.map(y=>y.year), current: (years.find(y=>y.is_current)||{}).year || null };
+  db = out;
+}
+async function refreshDB(){ await loadDB(); }
+
+const TAG_PALETTE = [
+  {bg:'#E6F1FB',text:'#0C447C'},
+  {bg:'#EAF3DE',text:'#173404'},
+  {bg:'#EEEDFE',text:'#26215C'},
+  {bg:'#FBEAF0',text:'#4B1528'},
+  {bg:'#FAEEDA',text:'#412402'},
+  {bg:'#E1F5EE',text:'#04342C'}
+];
+function typeColor(type){
+  const t = type || '-';
+  let hash = 0;
+  for(let i=0;i<t.length;i++){ hash = (hash*31 + t.charCodeAt(i)) >>> 0; }
+  return TAG_PALETTE[hash % TAG_PALETTE.length];
+}
+function renderTag(type){
+  const c = typeColor(type);
+  return `<span class="tag" style="background:${c.bg};color:${c.text}">${type||'-'}</span>`;
+}
+
+let db = seedDB();
+let session = null; // {type, id (uuid), code (user_code)}
+let loginType = 'student';
+let studentPage = 'info';
+let staffPage = 'activities';
+let adminPage = 'types';
+let staffPickedActivity = null;
+
+function setLoginType(t){
+  loginType = t;
+  document.getElementById('type-student').classList.toggle('active', t==='student');
+  document.getElementById('type-staff').classList.toggle('active', t==='staff');
+  document.getElementById('type-admin').classList.toggle('active', t==='admin');
+  const placeholders = {student:'รหัสนักศึกษา', staff:'รหัสบุคลากร', admin:'รหัสผู้ดูแลระบบ'};
+  document.getElementById('login-id').placeholder = placeholders[t];
+  document.getElementById('go-register-btn').style.display = t==='student' ? 'block' : 'none';
+}
+
+function showRegisterView(){
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('register-view').style.display = 'flex';
+  document.getElementById('register-error').style.display = 'none';
+  ['reg-id','reg-name','reg-faculty','reg-pw','reg-pw2'].forEach(id=>{ document.getElementById(id).value=''; });
+}
+function showLoginView(){
+  document.getElementById('register-view').style.display = 'none';
+  document.getElementById('login-view').style.display = 'flex';
+}
+
+async function enterApp(){
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user){ showLoginScreen(); return; }
+  await loadDB();
+  const profile = db.students[user.id] || db.staff[user.id] || db.admins[user.id];
+  if(!profile){
+    // signed in but no matching profile row (shouldn't normally happen)
+    await sb.auth.signOut();
+    showLoginScreen();
+    return;
+  }
+  session = { type: profile.role, id: user.id, code: profile.user_code };
+  studentPage = 'info'; staffPage = 'activities'; adminPage = 'types';
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('register-view').style.display = 'none';
+  document.getElementById('app-view').classList.add('show');
+  renderApp();
+}
+function showLoginScreen(){
+  document.getElementById('login-loading').style.display = 'none';
+  document.getElementById('login-form-area').style.display = 'block';
+  document.getElementById('login-view').style.display = 'flex';
+}
+
+async function doRegisterStudent(){
+  const btn = document.getElementById('register-btn');
+  const id = document.getElementById('reg-id').value.trim();
+  const name = document.getElementById('reg-name').value.trim();
+  const faculty = document.getElementById('reg-faculty').value.trim();
+  const pw = document.getElementById('reg-pw').value.trim();
+  const pw2 = document.getElementById('reg-pw2').value.trim();
+  const errBox = document.getElementById('register-error');
+  errBox.style.display = 'none';
+  if(!id || !name || !pw || !pw2){
+    errBox.textContent = 'กรุณากรอกรหัสนักศึกษา ชื่อ-นามสกุล และรหัสผ่านให้ครบ';
+    errBox.style.display = 'block';
+    return;
+  }
+  if(pw.length < 6){
+    errBox.textContent = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+    errBox.style.display = 'block';
+    return;
+  }
+  if(pw !== pw2){
+    errBox.textContent = 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน';
+    errBox.style.display = 'block';
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'กำลังสมัครสมาชิก...';
+  const email = codeToEmail(id);
+  const { data: signUpData, error: signUpErr } = await sb.auth.signUp({ email, password: pw });
+  if(signUpErr){
+    errBox.textContent = signUpErr.message.includes('already') ? 'มีรหัสนักศึกษานี้ในระบบแล้ว กรุณาเข้าสู่ระบบแทน' : signUpErr.message;
+    errBox.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'สมัครและเข้าสู่ระบบ';
+    return;
+  }
+  const uid = signUpData.user.id;
+  const { error: profErr } = await sb.from('profiles').insert({
+    id: uid, user_code: id, role: 'student', name, faculty,
+    major:'', year:'', section:'', curriculum:'', admit:'', dob:'',
+    address:'', phone:'', email:'', facebook:'', line:'', other:''
+  });
+  btn.disabled = false; btn.textContent = 'สมัครและเข้าสู่ระบบ';
+  if(profErr){
+    errBox.textContent = profErr.message.includes('duplicate') ? 'มีรหัสนักศึกษานี้ในระบบแล้ว กรุณาเข้าสู่ระบบแทน' : profErr.message;
+    errBox.style.display = 'block';
+    return;
+  }
+  await enterApp();
+}
+
+async function doLogin(){
+  const btn = document.getElementById('login-btn');
+  const id = document.getElementById('login-id').value.trim();
+  const pw = document.getElementById('login-pw').value.trim();
+  const errBox = document.getElementById('login-error');
+  errBox.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ...';
+  const { error } = await sb.auth.signInWithPassword({ email: codeToEmail(id), password: pw });
+  btn.disabled = false; btn.textContent = 'เข้าสู่ระบบ';
+  if(error){
+    errBox.textContent = 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง';
+    errBox.style.display = 'block';
+    return;
+  }
+  await enterApp();
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+async function doLogout(){
+  closeSidebar();
+  await sb.auth.signOut();
+  session = null;
+  document.getElementById('app-view').classList.remove('show');
+  document.getElementById('login-view').style.display = 'flex';
+  document.getElementById('login-id').value='';
+  document.getElementById('login-pw').value='';
+}
+
+function initials(name){
+  const parts = (name||'').trim().split(' ');
+  return parts[0] ? parts[0].charAt(0) : 'U';
+}
+
+function renderApp(){
+  if(session.type === 'student') renderStudentApp();
+  else if(session.type === 'staff') renderStaffApp();
+  else renderAdminApp();
+}
+
+/* ============ STUDENT ============ */
+function renderStudentApp(){
+  const s = db.students[session.id];
+  document.getElementById('sidebar').innerHTML = `
+    <div class="brand"><div class="mark">S</div><div class="txt"><b>SAMS</b><small>ระบบจัดการกิจกรรม</small></div></div>
+    <div class="user-chip">
+      <div class="av">${initials(s.name)}</div>
+      <div class="info"><b>${s.name}</b><small>รหัส ${s.user_code}</small></div>
+    </div>
+    <button class="nav-item ${studentPage==='info'?'active':''}" onclick="goStudent('info')"><span class="dot"></span>ข้อมูลนักศึกษา</button>
+    <button class="nav-item ${studentPage==='activities'?'active':''}" onclick="goStudent('activities')"><span class="dot"></span>การเข้าร่วมกิจกรรม</button>
+    <button class="nav-item ${studentPage==='report'?'active':''}" onclick="goStudent('report')"><span class="dot"></span>รายงานสรุปกิจกรรม</button>
+    <button class="nav-item logout" onclick="doLogout()"><span class="dot"></span>ออกจากระบบ</button>
+  `;
+  const main = document.getElementById('main');
+  if(studentPage==='info') main.innerHTML = studentInfoPage(s);
+  else if(studentPage==='activities') main.innerHTML = studentActivitiesPage();
+  else main.innerHTML = studentReportPage();
+}
+async function goStudent(p){ studentPage = p; closeSidebar(); await refreshDB(); renderStudentApp(); }
+
+function studentInfoPage(s){
+  const fields = [
+    ['name','ชื่อ-นามสกุล'],['faculty','คณะ'],['major','สาขาวิชา'],['year','ชั้นปี'],
+    ['section','กลุ่ม/ห้อง'],['curriculum','หลักสูตร'],['admit','เข้าศึกษาภาค/ปี'],['dob','วันเดือนปีเกิด'],
+    ['phone','เบอร์โทรศัพท์'],['email','E-mail'],['facebook','Facebook'],['line','Line'],
+    ['other','ช่องทางอื่นๆ']
+  ];
+  const fieldHtml = fields.map(([k,label])=>`
+    <div class="form-field"><label>${label}</label><input id="f_${k}" value="${(s[k]||'').replace(/"/g,'&quot;')}"></div>
+  `).join('');
+  return `
+    <div class="page-head"><h2>ข้อมูลนักศึกษา</h2><p>ตรวจสอบและแก้ไขข้อมูลส่วนตัวของคุณ</p></div>
+    <div class="card">
+      <div class="profile-head">
+        <div class="avatar-lg">${initials(s.name)}</div>
+        <div><h3>${s.name}</h3><p>รหัสนักศึกษา ${s.user_code} · ${s.faculty}</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="form-field"><label>ที่อยู่</label><textarea id="f_address" rows="2">${(s.address||'')}</textarea></div>
+      <div class="grid2">${fieldHtml}</div>
+      <button class="btn primary" onclick="saveStudentInfo()">บันทึกข้อมูล</button>
+      <span id="save-msg" style="font-size:12.5px;color:var(--green);margin-left:10px;display:none;">บันทึกแล้ว</span>
+    </div>
+  `;
+}
+async function saveStudentInfo(){
+  const patch = {};
+  ['name','faculty','major','year','section','curriculum','admit','dob','phone','email','facebook','line','other'].forEach(k=>{
+    const el = document.getElementById('f_'+k);
+    if(el) patch[k] = el.value;
+  });
+  const addr = document.getElementById('f_address');
+  if(addr) patch.address = addr.value;
+  await sb.from('profiles').update(patch).eq('id', session.id);
+  await refreshDB();
+  const msg = document.getElementById('save-msg');
+  msg.style.display='inline';
+  setTimeout(()=>msg.style.display='none', 1800);
+  renderStudentApp();
+}
+
+function studentRegistrationFor(actId){
+  return Object.values(db.registrations).find(r=>r.activityId===actId && r.studentId===session.id);
+}
+function studentActivitiesPage(){
+  const rows = Object.entries(db.activities).map(([id,a])=>{
+    const reg = studentRegistrationFor(id);
+    let statusHtml, actionHtml;
+    if(!reg){
+      statusHtml = `<span class="badge open">เปิดรับสมัคร</span>`;
+      actionHtml = `<button class="btn small primary" onclick="registerActivity('${id}')">ลงทะเบียน</button>`;
+    } else if(reg.status==='registered'){
+      statusHtml = `<span class="badge registered">ลงทะเบียนแล้ว</span>`;
+      actionHtml = `<button class="btn small ghost" onclick="unregisterActivity('${id}')">ยกเลิก</button>`;
+    } else {
+      statusHtml = `<span class="badge attended">เข้าร่วมแล้ว · ${reg.hours} ชม.</span>`;
+      actionHtml = '';
+    }
+    return `
+      <div class="act-card">
+        <div>
+          ${renderTag(a.type)}
+          <h4>${a.name}</h4>
+          <div class="meta">${a.date} · ${a.time} · ${a.location}<br>สะสม ${a.hours} ชั่วโมงกิจกรรม · ปีการศึกษา ${a.year||'-'}</div>
+        </div>
+        <div style="text-align:right;display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+          ${statusHtml}${actionHtml}
+        </div>
+      </div>`;
+  }).join('');
+  return `
+    <div class="page-head"><h2>การเข้าร่วมกิจกรรม</h2><p>ลงทะเบียนเข้าร่วมกิจกรรมที่เปิดรับสมัคร และตรวจสอบสถานะของคุณ</p></div>
+    <div class="card">${rows || '<div class="empty">ยังไม่มีกิจกรรมในระบบ</div>'}</div>
+  `;
+}
+async function registerActivity(actId){
+  await sb.from('registrations').insert({ activity_id: actId, student_id: session.id, status:'registered', hours:0 });
+  await refreshDB();
+  renderStudentApp();
+}
+async function unregisterActivity(actId){
+  await sb.from('registrations').delete().eq('activity_id', actId).eq('student_id', session.id);
+  await refreshDB();
+  renderStudentApp();
+}
+function studentReportPage(){
+  const myRegs = Object.values(db.registrations).filter(r=>r.studentId===session.id);
+  const attended = myRegs.filter(r=>r.status==='attended');
+  const totalHours = attended.reduce((sum,r)=>sum+Number(r.hours||0),0);
+  const rows = myRegs.map(r=>{
+    const a = db.activities[r.activityId] || {};
+    return `<tr>
+      <td>${a.name||'-'}</td><td>${a.date||'-'}</td>
+      <td>${r.status==='attended'?`<span class="badge attended">เข้าร่วมแล้ว</span>`:`<span class="badge registered">ลงทะเบียนแล้ว</span>`}</td>
+      <td>${r.status==='attended'?r.hours:'-'}</td>
+    </tr>`;
+  }).join('');
+  return `
+    <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;">
+      <div><h2>รายงานสรุปกิจกรรม</h2><p>สรุปจำนวนกิจกรรมและชั่วโมงสะสมของคุณ</p></div>
+      <button class="btn primary" onclick="printStudentReport()">&#128438; พิมพ์ใบสรุปผลกิจกรรม</button>
+    </div>
+    <div class="grid3">
+      <div class="stat"><div class="num">${myRegs.length}</div><div class="lbl">กิจกรรมที่ลงทะเบียน</div></div>
+      <div class="stat"><div class="num">${attended.length}</div><div class="lbl">กิจกรรมที่เข้าร่วมแล้ว</div></div>
+      <div class="stat"><div class="num">${totalHours}</div><div class="lbl">ชั่วโมงกิจกรรมสะสม</div></div>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>กิจกรรม</th><th>วันที่</th><th>สถานะ</th><th>ชั่วโมง</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="4" class="empty">ยังไม่มีประวัติการเข้าร่วมกิจกรรม</td></tr>'}</tbody></table>
+    </div>
+  `;
+}
+function printStudentReport(){
+  const s = db.students[session.id];
+  const myRegs = Object.values(db.registrations).filter(r=>r.studentId===session.id);
+  const attended = myRegs.filter(r=>r.status==='attended').sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const totalHours = attended.reduce((sum,r)=>sum+Number(r.hours||0),0);
+  const today = new Date().toLocaleDateString('th-TH', {year:'numeric', month:'long', day:'numeric'});
+  const rows = attended.map((r,i)=>{
+    const a = db.activities[r.activityId] || {};
+    return `<tr>
+      <td style="text-align:center;">${i+1}</td>
+      <td>${a.name||'-'}</td>
+      <td>${a.type||'-'}</td>
+      <td>${a.date||'-'}</td>
+      <td style="text-align:center;">${r.hours||0}</td>
+    </tr>`;
+  }).join('');
+  const win = window.open('', '_blank');
+  win.document.write(`
+    <!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+    <title>ใบสรุปผลกิจกรรม - ${s.name}</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap');
+      *{box-sizing:border-box;}
+      body{font-family:'Sarabun',sans-serif;color:#1B2333;padding:40px 48px;max-width:820px;margin:0 auto;}
+      h1,h2,h3{font-family:'Kanit',sans-serif;}
+      .head{text-align:center;margin-bottom:26px;}
+      .head h1{font-size:21px;color:#1B2A4A;margin:0 0 4px;}
+      .head p{margin:0;color:#6B7280;font-size:13px;}
+      .info-box{border:1.5px solid #E4E6EE;border-radius:10px;padding:16px 20px;margin-bottom:22px;}
+      .info-box table{width:100%;border-collapse:collapse;font-size:13.5px;}
+      .info-box td{padding:4px 0;}
+      .info-box td.lbl{color:#6B7280;width:130px;}
+      .stats{display:flex;gap:14px;margin-bottom:22px;}
+      .stats div{flex:1;text-align:center;border:1.5px solid #E4E6EE;border-radius:10px;padding:14px 8px;}
+      .stats .num{font-family:'Kanit';font-size:24px;font-weight:600;color:#1B2A4A;}
+      .stats .lbl{font-size:11.5px;color:#6B7280;margin-top:2px;}
+      table.list{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:34px;}
+      table.list th{background:#F5F6FA;text-align:left;padding:8px 10px;border:1px solid #E4E6EE;font-size:12px;}
+      table.list td{padding:8px 10px;border:1px solid #E4E6EE;}
+      .empty{text-align:center;color:#6B7280;padding:16px;}
+      .sign-row{display:flex;justify-content:space-between;margin-top:50px;}
+      .sign-box{width:46%;text-align:center;font-size:13px;}
+      .sign-line{border-bottom:1px dashed #6B7280;height:50px;margin-bottom:8px;}
+      .footer-note{margin-top:30px;font-size:11px;color:#6B7280;text-align:right;}
+      @media print{ body{padding:20px 28px;} }
+    </style></head>
+    <body>
+      <div class="head">
+        <h1>ใบสรุปผลกิจกรรมนักศึกษา</h1>
+        <p>School Activity Management System (SAMS)</p>
+      </div>
+      <div class="info-box">
+        <table>
+          <tr><td class="lbl">ชื่อ-นามสกุล</td><td><b>${s.name}</b></td><td class="lbl">รหัสนักศึกษา</td><td><b>${s.user_code}</b></td></tr>
+          <tr><td class="lbl">คณะ</td><td>${s.faculty||'-'}</td><td class="lbl">สาขาวิชา</td><td>${s.major||'-'}</td></tr>
+          <tr><td class="lbl">ชั้นปี</td><td>${s.year||'-'}</td><td class="lbl">วันที่ออกเอกสาร</td><td>${today}</td></tr>
+        </table>
+      </div>
+      <div class="stats">
+        <div><div class="num">${myRegs.length}</div><div class="lbl">กิจกรรมที่ลงทะเบียน</div></div>
+        <div><div class="num">${attended.length}</div><div class="lbl">กิจกรรมที่เข้าร่วมแล้ว</div></div>
+        <div><div class="num">${totalHours}</div><div class="lbl">ชั่วโมงกิจกรรมสะสม</div></div>
+      </div>
+      <table class="list">
+        <thead><tr><th style="width:34px;text-align:center;">ลำดับ</th><th>ชื่อกิจกรรม</th><th>ประเภท</th><th>วันที่จัดกิจกรรม</th><th style="width:70px;text-align:center;">ชั่วโมง</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="5" class="empty">ยังไม่มีประวัติการเข้าร่วมกิจกรรมที่บันทึกผลแล้ว</td></tr>'}</tbody>
+      </table>
+      <div class="sign-row">
+        <div class="sign-box"><div class="sign-line"></div>ลงชื่อนักศึกษา</div>
+        <div class="sign-box"><div class="sign-line"></div>ลงชื่อเจ้าหน้าที่ / ผู้รับรอง</div>
+      </div>
+      <div class="footer-note">พิมพ์จากระบบ SAMS เมื่อวันที่ ${today}</div>
+    </body></html>
+  `);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(), 400);
+}
+
+/* ============ STAFF ============ */
+function renderStaffApp(){
+  const st = db.staff[session.id];
+  document.getElementById('sidebar').innerHTML = `
+    <div class="brand"><div class="mark">S</div><div class="txt"><b>SAMS</b><small>ระบบจัดการกิจกรรม</small></div></div>
+    <div class="user-chip">
+      <div class="av">${initials(st.name)}</div>
+      <div class="info"><b>${st.name}</b><small>${st.staff_role||'บุคลากร'}</small></div>
+    </div>
+    <button class="nav-item ${staffPage==='activities'?'active':''}" onclick="goStaff('activities')"><span class="dot"></span>จัดการกิจกรรม</button>
+    <button class="nav-item ${staffPage==='record'?'active':''}" onclick="goStaff('record')"><span class="dot"></span>บันทึกผลกิจกรรม</button>
+    <button class="nav-item ${staffPage==='students'?'active':''}" onclick="goStaff('students')"><span class="dot"></span>ข้อมูลนักศึกษา</button>
+    <button class="nav-item ${staffPage==='report'?'active':''}" onclick="goStaff('report')"><span class="dot"></span>รายงานสรุป</button>
+    <button class="nav-item logout" onclick="doLogout()"><span class="dot"></span>ออกจากระบบ</button>
+  `;
+  const main = document.getElementById('main');
+  if(staffPage==='activities') main.innerHTML = staffActivitiesPage();
+  else if(staffPage==='record') main.innerHTML = staffRecordPage();
+  else if(staffPage==='students') main.innerHTML = staffStudentsPage();
+  else main.innerHTML = staffReportPage();
+}
+async function goStaff(p){ staffPage = p; if(p==='record') staffPickedActivity=null; closeSidebar(); await refreshDB(); renderStaffApp(); }
+
+function staffActivitiesPage(){
+  const rows = Object.entries(db.activities).map(([id,a])=>{
+    const regCount = Object.values(db.registrations).filter(r=>r.activityId===id).length;
+    return `<tr>
+      <td>${renderTag(a.type)}</td>
+      <td><b>${a.name}</b><br><span style="color:var(--ink-soft);font-size:11.5px">${a.location} · ปีการศึกษา ${a.year||'-'}</span></td>
+      <td>${a.date}<br><span style="color:var(--ink-soft);font-size:11.5px">${a.time}</span></td>
+      <td>${a.hours} ชม.</td>
+      <td>${regCount} คน</td>
+      <td><button class="btn small danger" onclick="deleteActivity('${id}')">ลบ</button></td>
+    </tr>`;
+  }).join('');
+  const typeOptions = db.activityTypes.map(t=>`<option>${t}</option>`).join('');
+  const yearOptions = db.academicYears.list.map(y=>`<option ${y===db.academicYears.current?'selected':''}>${y}</option>`).join('');
+  return `
+    <div class="page-head"><h2>จัดการกิจกรรม</h2><p>เพิ่ม แก้ไข หรือลบกิจกรรมของโรงเรียน</p></div>
+    <div class="card">
+      <h3 style="margin-top:0;font-size:14.5px;color:var(--navy);">เพิ่มกิจกรรมใหม่</h3>
+      <div class="grid3">
+        <div class="form-field"><label>ชื่อกิจกรรม</label><input id="na_name"></div>
+        <div class="form-field"><label>ประเภท</label>
+          <select id="na_type">${typeOptions}</select>
+        </div>
+        <div class="form-field"><label>ปีการศึกษา</label>
+          <select id="na_year">${yearOptions}</select>
+        </div>
+        <div class="form-field"><label>สถานที่</label><input id="na_location"></div>
+        <div class="form-field"><label>วันที่จัดกิจกรรม</label><input id="na_date" type="date"></div>
+        <div class="form-field"><label>เวลา</label><input id="na_time" placeholder="09:00-16:00"></div>
+        <div class="form-field"><label>จำนวนชั่วโมงสะสม</label><input id="na_hours" type="number" value="2"></div>
+      </div>
+      <button class="btn primary" onclick="addActivity()">เพิ่มกิจกรรม</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>ประเภท</th><th>กิจกรรม</th><th>วันที่</th><th>ชั่วโมง</th><th>ผู้ลงทะเบียน</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6" class="empty">ยังไม่มีกิจกรรม</td></tr>'}</tbody></table>
+    </div>
+  `;
+}
+async function addActivity(){
+  const name = document.getElementById('na_name').value.trim();
+  if(!name){ alert('กรุณากรอกชื่อกิจกรรม'); return; }
+  const payload = {
+    name,
+    type: document.getElementById('na_type').value,
+    year: document.getElementById('na_year').value,
+    location: document.getElementById('na_location').value,
+    activity_date: document.getElementById('na_date').value || null,
+    time_range: document.getElementById('na_time').value || '-',
+    hours: Number(document.getElementById('na_hours').value)||0,
+    teacher_id: session.id
+  };
+  await sb.from('activities').insert(payload);
+  await refreshDB();
+  renderStaffApp();
+}
+async function deleteActivity(id){
+  if(!confirm('ยืนยันการลบกิจกรรมนี้?')) return;
+  await sb.from('activities').delete().eq('id', id); // registrations cascade
+  await refreshDB();
+  renderStaffApp();
+}
+
+function staffRecordPage(){
+  const options = Object.entries(db.activities).map(([id,a])=>`<option value="${id}" ${staffPickedActivity===id?'selected':''}>${a.name}</option>`).join('');
+  let body = '';
+  if(staffPickedActivity && db.activities[staffPickedActivity]){
+    const regs = Object.entries(db.registrations).filter(([k,r])=>r.activityId===staffPickedActivity);
+    const act = db.activities[staffPickedActivity];
+    const rows = regs.map(([rid,r])=>{
+      const s = db.students[r.studentId] || {name:'(ไม่พบข้อมูล)', user_code:r.studentId};
+      return `<tr>
+        <td>${s.user_code}</td><td>${s.name}</td>
+        <td>${r.status==='attended'?`<span class="badge attended">เข้าร่วมแล้ว</span>`:`<span class="badge registered">ลงทะเบียนแล้ว</span>`}</td>
+        <td><input type="number" id="hr_${rid}" value="${r.status==='attended'?r.hours:act.hours}" style="width:70px;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;"></td>
+        <td>${r.status==='attended' ? '' : `<button class="btn small primary" onclick="markAttended('${rid}')">บันทึกเข้าร่วม</button>`}</td>
+      </tr>`;
+    }).join('');
+    body = `<div class="card">
+      <table><thead><tr><th>รหัสนักศึกษา</th><th>ชื่อ-นามสกุล</th><th>สถานะ</th><th>ชั่วโมง</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="5" class="empty">ยังไม่มีนักศึกษาลงทะเบียนกิจกรรมนี้</td></tr>'}</tbody></table>
+    </div>`;
+  } else {
+    body = `<div class="card"><div class="empty">เลือกกิจกรรมด้านบนเพื่อบันทึกผลการเข้าร่วม</div></div>`;
+  }
+  return `
+    <div class="page-head"><h2>บันทึกผลกิจกรรม</h2><p>เลือกกิจกรรม แล้วบันทึกการเข้าร่วมและชั่วโมงสะสมของนักศึกษา</p></div>
+    <div class="card">
+      <div class="form-field"><label>เลือกกิจกรรม</label>
+        <select class="act-select" onchange="staffPickedActivity=this.value;renderStaffApp();">
+          <option value="">-- เลือกกิจกรรม --</option>${options}
+        </select>
+      </div>
+    </div>
+    ${body}
+  `;
+}
+async function markAttended(rid){
+  const hrInput = document.getElementById('hr_'+rid);
+  const hours = Number(hrInput.value)||0;
+  await sb.from('registrations').update({ status:'attended', hours }).eq('id', rid);
+  await refreshDB();
+  renderStaffApp();
+}
+
+function staffStudentsPage(){
+  const rows = Object.entries(db.students).map(([id,s])=>{
+    const hours = Object.values(db.registrations).filter(r=>r.studentId===id && r.status==='attended').reduce((sum,r)=>sum+Number(r.hours||0),0);
+    return `<tr>
+      <td>${s.user_code}</td><td>${s.name}</td><td>${s.faculty}</td><td>${s.major}</td><td>ปี ${s.year}</td>
+      <td>${s.phone||'-'}</td><td>${hours} ชม.</td>
+    </tr>`;
+  }).join('');
+  return `
+    <div class="page-head"><h2>ข้อมูลนักศึกษา</h2><p>รายชื่อนักศึกษาทั้งหมดในระบบ</p></div>
+    <div class="card">
+      <table><thead><tr><th>รหัส</th><th>ชื่อ-นามสกุล</th><th>คณะ</th><th>สาขา</th><th>ชั้นปี</th><th>โทรศัพท์</th><th>ชั่วโมงสะสม</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="7" class="empty">ยังไม่มีนักศึกษาในระบบ</td></tr>'}</tbody></table>
+    </div>
+  `;
+}
+
+function staffReportPage(){
+  const actRows = Object.entries(db.activities).map(([id,a])=>{
+    const regs = Object.values(db.registrations).filter(r=>r.activityId===id);
+    const attended = regs.filter(r=>r.status==='attended').length;
+    return `<tr><td>${renderTag(a.type)} ${a.name}</td><td>${regs.length}</td><td>${attended}</td><td>${a.date}</td></tr>`;
+  }).join('');
+  const studentTotals = Object.entries(db.students).map(([id,s])=>{
+    const hours = Object.values(db.registrations).filter(r=>r.studentId===id && r.status==='attended').reduce((sum,r)=>sum+Number(r.hours||0),0);
+    return {id, name:s.name, hours};
+  }).sort((a,b)=>b.hours-a.hours);
+  const topRows = studentTotals.map(t=>`<tr><td>${db.students[t.id]?.user_code||t.id}</td><td>${t.name}</td><td>${t.hours} ชม.</td></tr>`).join('');
+  const totalActs = Object.keys(db.activities).length;
+  const totalRegs = Object.keys(db.registrations).length;
+  const totalAttended = Object.values(db.registrations).filter(r=>r.status==='attended').length;
+  return `
+    <div class="page-head"><h2>รายงานสรุป</h2><p>ภาพรวมการจัดกิจกรรมและการเข้าร่วมของนักศึกษา</p></div>
+    <div class="grid3">
+      <div class="stat"><div class="num">${totalActs}</div><div class="lbl">กิจกรรมทั้งหมด</div></div>
+      <div class="stat"><div class="num">${totalRegs}</div><div class="lbl">การลงทะเบียนทั้งหมด</div></div>
+      <div class="stat"><div class="num">${totalAttended}</div><div class="lbl">บันทึกเข้าร่วมแล้ว</div></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;font-size:14.5px;color:var(--navy);">สรุปตามกิจกรรม</h3>
+      <table><thead><tr><th>กิจกรรม</th><th>ลงทะเบียน</th><th>เข้าร่วมแล้ว</th><th>วันที่</th></tr></thead>
+      <tbody>${actRows || '<tr><td colspan="4" class="empty">ยังไม่มีกิจกรรม</td></tr>'}</tbody></table>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;font-size:14.5px;color:var(--navy);">ชั่วโมงกิจกรรมสะสมของนักศึกษา</h3>
+      <table><thead><tr><th>รหัส</th><th>ชื่อ-นามสกุล</th><th>ชั่วโมงสะสม</th></tr></thead>
+      <tbody>${topRows || '<tr><td colspan="3" class="empty">ยังไม่มีข้อมูล</td></tr>'}</tbody></table>
+    </div>
+  `;
+}
+
+document.getElementById('sync-note').textContent = 'ข้อมูลจะซิงค์อัตโนมัติกับทุกอุปกรณ์ที่เปิดหน้านี้';
+
+/* ============ ADMIN ============ */
+function renderAdminApp(){
+  const ad = db.admins[session.id];
+  document.getElementById('sidebar').innerHTML = `
+    <div class="brand"><div class="mark">S</div><div class="txt"><b>SAMS</b><small>ระบบจัดการกิจกรรม</small></div></div>
+    <div class="user-chip">
+      <div class="av">${initials(ad.name)}</div>
+      <div class="info"><b>${ad.name}</b><small>${ad.staff_role||'ผู้ดูแลระบบ'}</small></div>
+    </div>
+    <button class="nav-item ${adminPage==='types'?'active':''}" onclick="goAdmin('types')"><span class="dot"></span>ประเภทกิจกรรม</button>
+    <button class="nav-item ${adminPage==='years'?'active':''}" onclick="goAdmin('years')"><span class="dot"></span>ปีการศึกษา</button>
+    <button class="nav-item ${adminPage==='users'?'active':''}" onclick="goAdmin('users')"><span class="dot"></span>จัดการผู้ใช้งาน</button>
+    <button class="nav-item ${adminPage==='overview'?'active':''}" onclick="goAdmin('overview')"><span class="dot"></span>รายงานภาพรวม</button>
+    <button class="nav-item logout" onclick="doLogout()"><span class="dot"></span>ออกจากระบบ</button>
+  `;
+  const main = document.getElementById('main');
+  if(adminPage==='types') main.innerHTML = adminTypesPage();
+  else if(adminPage==='years') main.innerHTML = adminYearsPage();
+  else if(adminPage==='users') main.innerHTML = adminUsersPage();
+  else main.innerHTML = staffReportPage();
+}
+async function goAdmin(p){ adminPage = p; closeSidebar(); await refreshDB(); renderAdminApp(); }
+
+function adminTypesPage(){
+  const rows = db.activityTypes.map(t=>{
+    const inUse = Object.values(db.activities).filter(a=>a.type===t).length;
+    return `<tr><td>${renderTag(t)}</td><td>${inUse} กิจกรรม</td>
+    <td>${inUse===0?`<button class="btn small danger" onclick="deleteType('${t}')">ลบ</button>`:'<span style="color:var(--ink-soft);font-size:12px">ใช้งานอยู่</span>'}</td></tr>`;
+  }).join('');
+  return `
+    <div class="page-head"><h2>ประเภทกิจกรรม</h2><p>กำหนดประเภทกิจกรรมที่บุคลากรสามารถเลือกใช้เมื่อสร้างกิจกรรม</p></div>
+    <div class="card">
+      <div style="display:flex;gap:10px;align-items:flex-end;max-width:420px;">
+        <div class="form-field" style="flex:1;margin-bottom:0;"><label>เพิ่มประเภทกิจกรรมใหม่</label><input id="new-type-input" placeholder="เช่น ค่ายอบรม"></div>
+        <button class="btn primary" onclick="addType()" style="height:38px;">เพิ่ม</button>
+      </div>
+    </div>
+    <div class="card"><table><thead><tr><th>ประเภท</th><th>จำนวนกิจกรรมที่ใช้</th><th></th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="3" class="empty">ยังไม่มีประเภทกิจกรรม</td></tr>'}</tbody></table></div>
+  `;
+}
+async function addType(){
+  try{
+    const input = document.getElementById('new-type-input');
+    const val = input.value.trim();
+    if(!val){ alert('กรุณากรอกชื่อประเภทกิจกรรม'); return; }
+    if(db.activityTypes.includes(val)){ alert('มีประเภทนี้อยู่แล้ว'); return; }
+    const { error } = await sb.from('activity_types').insert({ name: val });
+    if(error){ console.error('addType error:', error); alert('เพิ่มไม่สำเร็จ: ' + error.message); return; }
+    await refreshDB();
+    renderAdminApp();
+  }catch(e){ console.error('addType exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+}
+async function deleteType(t){
+  try{
+    if(!confirm('ยืนยันการลบประเภทกิจกรรมนี้?')) return;
+    const { error } = await sb.from('activity_types').delete().eq('name', t);
+    if(error){ console.error('deleteType error:', error); alert('ลบไม่สำเร็จ: ' + error.message); return; }
+    await refreshDB();
+    renderAdminApp();
+  }catch(e){ console.error('deleteType exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+}
+
+function adminYearsPage(){
+  const rows = db.academicYears.list.map(y=>{
+    const isCurrent = y===db.academicYears.current;
+    const inUse = Object.values(db.activities).filter(a=>a.year===y).length;
+    const actions = [];
+    if(!isCurrent) actions.push(`<button class="btn small ghost" onclick="setCurrentYear('${y}')">ตั้งเป็นปีปัจจุบัน</button>`);
+    if(!isCurrent && inUse===0) actions.push(`<button class="btn small danger" onclick="deleteYear('${y}')">ลบ</button>`);
+    return `<tr><td>ปีการศึกษา ${y} ${isCurrent?'<span class="badge attended">ปีปัจจุบัน</span>':''}</td><td>${inUse} กิจกรรม</td><td>${actions.join(' ')}</td></tr>`;
+  }).join('');
+  return `
+    <div class="page-head"><h2>ปีการศึกษา</h2><p>กำหนดปีการศึกษาที่เปิดใช้งานในระบบ และเลือกปีการศึกษาปัจจุบัน</p></div>
+    <div class="card">
+      <div style="display:flex;gap:10px;align-items:flex-end;max-width:320px;">
+        <div class="form-field" style="flex:1;margin-bottom:0;"><label>เพิ่มปีการศึกษาใหม่</label><input id="new-year-input" placeholder="เช่น 2570"></div>
+        <button class="btn primary" onclick="addYear()" style="height:38px;">เพิ่ม</button>
+      </div>
+    </div>
+    <div class="card"><table><thead><tr><th>ปีการศึกษา</th><th>จำนวนกิจกรรมที่ใช้</th><th></th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="3" class="empty">ยังไม่มีปีการศึกษา</td></tr>'}</tbody></table></div>
+  `;
+}
+async function addYear(){
+  try{
+    const input = document.getElementById('new-year-input');
+    const val = input.value.trim();
+    if(!val){ alert('กรุณากรอกปีการศึกษา'); return; }
+    if(db.academicYears.list.includes(val)){ alert('มีปีการศึกษานี้อยู่แล้ว'); return; }
+    const { error } = await sb.from('academic_years').insert({ year: val, is_current:false });
+    if(error){ console.error('addYear error:', error); alert('เพิ่มไม่สำเร็จ: ' + error.message); return; }
+    await refreshDB();
+    renderAdminApp();
+  }catch(e){ console.error('addYear exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+}
+async function setCurrentYear(y){
+  try{
+    const { error: e1 } = await sb.from('academic_years').update({ is_current:false }).eq('is_current', true);
+    if(e1){ console.error('setCurrentYear error (clear):', e1); alert('ตั้งค่าไม่สำเร็จ: ' + e1.message); return; }
+    const { error: e2 } = await sb.from('academic_years').update({ is_current:true }).eq('year', y);
+    if(e2){ console.error('setCurrentYear error (set):', e2); alert('ตั้งค่าไม่สำเร็จ: ' + e2.message); return; }
+    await refreshDB();
+    renderAdminApp();
+  }catch(e){ console.error('setCurrentYear exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+}
+async function deleteYear(y){
+  try{
+    if(!confirm('ยืนยันการลบปีการศึกษานี้?')) return;
+    const { error } = await sb.from('academic_years').delete().eq('year', y);
+    if(error){ console.error('deleteYear error:', error); alert('ลบไม่สำเร็จ: ' + error.message); return; }
+    await refreshDB();
+    renderAdminApp();
+  }catch(e){ console.error('deleteYear exception:', e); alert('เกิดข้อผิดพลาด: ' + e.message); }
+}
+
+function adminUsersPage(){
+  const adminRows = Object.entries(db.admins).map(([id,a])=>`
+    <tr><td>${a.user_code}</td><td>${a.name}</td><td>${a.staff_role||'ผู้ดูแลระบบ'}</td>
+    <td>${(id!==session.id && Object.keys(db.admins).length>1) ? `<button class="btn small danger" onclick="deleteUser('${id}')">ลบ</button>` : '<span style="color:var(--ink-soft);font-size:12px">-</span>'}</td></tr>`).join('');
+  const staffRows = Object.entries(db.staff).map(([id,s])=>`
+    <tr><td>${s.user_code}</td><td>${s.name}</td><td>${s.staff_role||'-'}</td>
+    <td><button class="btn small danger" onclick="deleteUser('${id}')">ลบ</button></td></tr>`).join('');
+  const studentRows = Object.entries(db.students).map(([id,s])=>`
+    <tr><td>${s.user_code}</td><td>${s.name}</td><td>${s.faculty||'-'}</td>
+    <td><button class="btn small danger" onclick="deleteUser('${id}')">ลบ</button></td></tr>`).join('');
+
+  return `
+    <div class="page-head"><h2>จัดการผู้ใช้งาน</h2><p>เพิ่ม ลบ และกำหนดสิทธิ์ผู้ใช้งานในระบบ</p></div>
+
+    <div class="card">
+      <h3 style="margin-top:0;font-size:14.5px;color:var(--navy);">เพิ่มผู้ใช้งานใหม่ (บุคลากร / ผู้ดูแลระบบ)</h3>
+      <p style="margin:-6px 0 14px;font-size:12.5px;color:var(--ink-soft);">บัญชีนักศึกษาให้สมัครสมาชิกด้วยตนเองที่หน้าเข้าสู่ระบบ</p>
+      <div class="grid3">
+        <div class="form-field"><label>ประเภทผู้ใช้</label>
+          <select id="nu_type" onchange="toggleUserFields()">
+            <option value="staff">บุคลากร</option>
+            <option value="admin">ผู้ดูแลระบบ</option>
+          </select>
+        </div>
+        <div class="form-field"><label>รหัสผู้ใช้</label><input id="nu_id" placeholder="เช่น T002 หรือ AD002"></div>
+        <div class="form-field"><label>รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)</label><input id="nu_pw" placeholder="เช่น 010150"></div>
+        <div class="form-field"><label>ชื่อ-นามสกุล</label><input id="nu_name"></div>
+        <div class="form-field" id="nu_role_wrap"><label>ตำแหน่ง/สิทธิ์ (เฉพาะบุคลากร)</label><input id="nu_role" placeholder="เช่น ครูที่ปรึกษากิจกรรม"></div>
+      </div>
+      <button class="btn primary" onclick="addUser()">เพิ่มผู้ใช้งาน</button>
+      <div id="adduser-error" style="display:none" class="login-error" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;font-size:14.5px;color:var(--navy);">ผู้ดูแลระบบ</h3>
+      <table><thead><tr><th>รหัส</th><th>ชื่อ-นามสกุล</th><th>สิทธิ์</th><th></th></tr></thead>
+      <tbody>${adminRows || '<tr><td colspan="4" class="empty">ไม่มีข้อมูล</td></tr>'}</tbody></table>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;font-size:14.5px;color:var(--navy);">บุคลากร</h3>
+      <table><thead><tr><th>รหัส</th><th>ชื่อ-นามสกุล</th><th>ตำแหน่ง</th><th></th></tr></thead>
+      <tbody>${staffRows || '<tr><td colspan="4" class="empty">ไม่มีข้อมูล</td></tr>'}</tbody></table>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;font-size:14.5px;color:var(--navy);">นักศึกษา</h3>
+      <p style="margin:-6px 0 14px;font-size:12px;color:var(--ink-soft);">รายชื่อนักศึกษาที่สมัครสมาชิกด้วยตนเองในระบบ</p>
+      <table><thead><tr><th>รหัส</th><th>ชื่อ-นามสกุล</th><th>คณะ</th><th></th></tr></thead>
+      <tbody>${studentRows || '<tr><td colspan="4" class="empty">ไม่มีข้อมูล</td></tr>'}</tbody></table>
+    </div>
+  `;
+}
+function toggleUserFields(){
+  const t = document.getElementById('nu_type').value;
+  document.getElementById('nu_role_wrap').style.display = t==='staff' ? 'block' : 'none';
+}
+async function addUser(){
+  const errBox = document.getElementById('adduser-error');
+  try{
+    const type = document.getElementById('nu_type').value;
+    const id = document.getElementById('nu_id').value.trim();
+    const pw = document.getElementById('nu_pw').value.trim();
+    const name = document.getElementById('nu_name').value.trim();
+    const staffRole = document.getElementById('nu_role').value;
+    errBox.style.display = 'none';
+    if(!id || !pw || !name){ alert('กรุณากรอกรหัสผู้ใช้ รหัสผ่าน และชื่อ-นามสกุลให้ครบ'); return; }
+    if(pw.length < 6){ alert('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'); return; }
+    const { data: { session: sbSession } } = await sb.auth.getSession();
+    if(!sbSession){ errBox.textContent = 'เซสชันหมดอายุ กรุณาล็อกอินใหม่'; errBox.style.display='block'; return; }
+    let resp;
+    try{
+      resp = await fetch('/api/create-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code:id, password:pw, name, role:type, staffRole, authToken: sbSession.access_token })
+      });
+    }catch(netErr){
+      console.error('addUser network error:', netErr);
+      errBox.textContent = 'เชื่อมต่อ /api/create-user ไม่ได้ (เช็คว่า deploy ขึ้น Vercel แล้วหรือยัง และตั้งค่า Environment Variables ครบหรือไม่)';
+      errBox.style.display = 'block';
+      return;
+    }
+    let result;
+    try{
+      result = await resp.json();
+    }catch(parseErr){
+      console.error('addUser non-JSON response, status:', resp.status);
+      errBox.textContent = `เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง (HTTP ${resp.status}) — /api/create-user อาจยังไม่ได้ deploy หรือ path ผิด`;
+      errBox.style.display = 'block';
+      return;
+    }
+    if(!resp.ok){
+      console.error('addUser API error:', result);
+      errBox.textContent = result.error || `เกิดข้อผิดพลาด (HTTP ${resp.status})`;
+      errBox.style.display = 'block';
+      return;
+    }
+    await refreshDB();
+    renderAdminApp();
+  }catch(e){
+    console.error('addUser exception:', e);
+    errBox.textContent = 'เกิดข้อผิดพลาด: ' + e.message;
+    errBox.style.display = 'block';
+  }
+}
+async function deleteUser(targetId){
+  try{
+    if(!confirm('ยืนยันการลบผู้ใช้งานนี้?')) return;
+    const { data: { session: sbSession } } = await sb.auth.getSession();
+    if(!sbSession){ alert('เซสชันหมดอายุ กรุณาล็อกอินใหม่'); return; }
+    let resp;
+    try{
+      resp = await fetch('/api/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetId, authToken: sbSession.access_token })
+      });
+    }catch(netErr){
+      console.error('deleteUser network error:', netErr);
+      alert('เชื่อมต่อ /api/delete-user ไม่ได้ (เช็คว่า deploy ขึ้น Vercel แล้วหรือยัง)');
+      return;
+    }
+    let result;
+    try{
+      result = await resp.json();
+    }catch(parseErr){
+      console.error('deleteUser non-JSON response, status:', resp.status);
+      alert(`เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง (HTTP ${resp.status})`);
+      return;
+    }
+    if(!resp.ok){ console.error('deleteUser API error:', result); alert(result.error || `เกิดข้อผิดพลาด (HTTP ${resp.status})`); return; }
+    await refreshDB();
+    renderAdminApp();
+  }catch(e){
+    console.error('deleteUser exception:', e);
+    alert('เกิดข้อผิดพลาด: ' + e.message);
+  }
+}
+
+// ---------- boot ----------
+(async function init(){
+  const { data: { session: sbSession } } = await sb.auth.getSession();
+  if(sbSession){
+    await enterApp();
+  } else {
+    showLoginScreen();
+  }
+  setInterval(async ()=>{
+    if(!session) return;
+    const skipPoll = (session.type==='student' && studentPage==='info')
+      || (session.type==='staff' && staffPage==='activities')
+      || (session.type==='admin' && ['types','years','users'].includes(adminPage));
+    if(skipPoll) return;
+    await refreshDB();
+    renderApp();
+  }, 5000);
+})();
+</script>
+</body>
+</html>
