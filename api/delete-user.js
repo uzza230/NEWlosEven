@@ -9,19 +9,29 @@ export default async function handler(req, res) {
   const url = process.env.SUPABASE_URL;
   const anonKey = process.env.SUPABASE_ANON_KEY;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !anonKey || !serviceKey) {
+    return res.status(500).json({ error: 'server misconfigured: missing env vars (' +
+      [!url && 'SUPABASE_URL', !anonKey && 'SUPABASE_ANON_KEY', !serviceKey && 'SUPABASE_SERVICE_ROLE_KEY'].filter(Boolean).join(', ') + ')' });
+  }
 
   const anon = createClient(url, anonKey);
   const { data: callerData, error: callerErr } = await anon.auth.getUser(authToken);
   if (callerErr || !callerData?.user) return res.status(401).json({ error: 'unauthorized' });
 
   const admin = createClient(url, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
-  const { data: callerProfile } = await admin
+  const { data: callerProfile, error: profileErr } = await admin
     .from('profiles')
     .select('role')
     .eq('id', callerData.user.id)
     .single();
-  if (!callerProfile || callerProfile.role !== 'admin') {
-    return res.status(403).json({ error: 'forbidden: admin only' });
+  if (profileErr) {
+    return res.status(500).json({ error: 'server error reading caller profile: ' + profileErr.message + ' (this usually means SUPABASE_SERVICE_ROLE_KEY is wrong, missing, or the same as the anon key)' });
+  }
+  if (!callerProfile) {
+    return res.status(403).json({ error: 'forbidden: no profile row found for caller id ' + callerData.user.id });
+  }
+  if (callerProfile.role !== 'admin') {
+    return res.status(403).json({ error: 'forbidden: admin only (caller role is "' + callerProfile.role + '")' });
   }
   if (targetId === callerData.user.id) {
     return res.status(400).json({ error: "can't delete your own account while logged in" });
